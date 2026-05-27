@@ -1,0 +1,638 @@
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>Junction Barber | Sharp Cuts. Clean Style.</title>
+  <!-- Google Fonts & Font Awesome -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <!-- Leaflet for map placeholder (lightweight) -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: #000000;
+      color: #ffffff;
+      scroll-behavior: smooth;
+    }
+
+    /* Black / Gold / White theme */
+    :root {
+      --gold: #D4AF37;
+      --gold-dark: #B28B2C;
+      --black: #000000;
+      --black-soft: #0a0a0a;
+      --white: #ffffff;
+      --gray-light: #f5f5f5;
+      --card-bg: #111111;
+      --border-gold: rgba(212, 175, 55, 0.3);
+    }
+
+    .container {
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+
+    /* Navigation */
+    nav {
+      background: rgba(0, 0, 0, 0.96);
+      backdrop-filter: blur(6px);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      border-bottom: 1px solid var(--border-gold);
+      padding: 14px 0;
+    }
+
+    .nav-wrapper {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 1.6rem;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+    }
+
+    .logo i {
+      color: var(--gold);
+      font-size: 2rem;
+    }
+
+    .logo span {
+      background: linear-gradient(135deg, var(--white) 0%, var(--gold) 100%);
+      background-clip: text;
+      -webkit-background-clip: text;
+      color: transparent;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 28px;
+      list-style: none;
+      flex-wrap: wrap;
+    }
+
+    .nav-links a {
+      color: var(--white);
+      text-decoration: none;
+      font-weight: 500;
+      transition: 0.3s;
+      font-size: 0.95rem;
+    }
+
+    .nav-links a:hover {
+      color: var(--gold);
+    }
+
+    .mobile-menu-btn {
+      display: none;
+      font-size: 1.8rem;
+      color: var(--gold);
+      cursor: pointer;
+    }
+
+    /* Hero */
+    .hero {
+      background: linear-gradient(rgba(0, 0, 0, 0.75), rgba(0, 0, 0, 0.85)), url('https://images.pexels.com/photos/3998417/pexels-photo-3998417.jpeg?auto=compress&cs=tinysrgb&w=1600') center/cover no-repeat;
+      min-height: 88vh;
+      display: flex;
+      align-items: center;
+      text-align: center;
+    }
+
+    .hero-content h1 {
+      font-size: 3.2rem;
+      font-weight: 800;
+      line-height: 1.2;
+      margin-bottom: 1rem;
+    }
+
+    .hero-content h1 span {
+      color: var(--gold);
+    }
+
+    .hero-content p {
+      font-size: 1.1rem;
+      margin-bottom: 2rem;
+      opacity: 0.9;
+    }
+
+    .btn-gold {
+      background: var(--gold);
+      color: black;
+      padding: 14px 32px;
+      font-weight: 700;
+      border: none;
+      border-radius: 40px;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: 0.2s;
+      box-shadow: 0 4px 12px rgba(212, 175, 55, 0.3);
+    }
+
+    .btn-gold:hover {
+      background: var(--gold-dark);
+      transform: scale(1.02);
+      box-shadow: 0 8px 20px rgba(212, 175, 55, 0.4);
+    }
+
+    .btn-outline {
+      background: transparent;
+      border: 1.5px solid var(--gold);
+      color: var(--gold);
+      padding: 12px 28px;
+      border-radius: 40px;
+      font-weight: 600;
+      transition: 0.3s;
+    }
+
+    .btn-outline:hover {
+      background: var(--gold);
+      color: black;
+    }
+
+    /* Sections */
+    section {
+      padding: 80px 0;
+      border-bottom: 1px solid #1a1a1a;
+    }
+
+    .section-title {
+      font-size: 2.2rem;
+      font-weight: 700;
+      margin-bottom: 48px;
+      text-align: center;
+    }
+
+    .section-title:after {
+      content: '';
+      display: block;
+      width: 70px;
+      height: 3px;
+      background: var(--gold);
+      margin: 16px auto 0;
+      border-radius: 4px;
+    }
+
+    /* pricing cards */
+    .cards-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 28px;
+    }
+
+    .price-card {
+      background: var(--card-bg);
+      border-radius: 20px;
+      overflow: hidden;
+      transition: all 0.3s ease;
+      border: 1px solid #222;
+      cursor: pointer;
+    }
+
+    .price-card:hover {
+      transform: translateY(-8px);
+      border-color: var(--gold);
+      box-shadow: 0 20px 30px -12px rgba(212, 175, 55, 0.2);
+    }
+
+    .card-img {
+      height: 200px;
+      background-size: cover;
+      background-position: center;
+    }
+
+    .card-content {
+      padding: 20px;
+    }
+
+    .card-title {
+      font-size: 1.35rem;
+      font-weight: 700;
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .price {
+      color: var(--gold);
+      font-weight: 800;
+    }
+
+    .desc {
+      font-size: 0.85rem;
+      opacity: 0.7;
+      margin: 10px 0;
+    }
+
+    /* Gallery before-after */
+    .gallery-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 24px;
+    }
+
+    .ba-item {
+      background: #111;
+      border-radius: 18px;
+      overflow: hidden;
+      transition: 0.25s;
+    }
+    .ba-item img {
+      width: 100%;
+      height: 220px;
+      object-fit: cover;
+      display: block;
+      transition: transform 0.4s;
+    }
+    .ba-item:hover img {
+      transform: scale(1.03);
+    }
+    .ba-label {
+      display: flex;
+      justify-content: space-between;
+      padding: 12px 16px;
+      background: #0c0c0c;
+      font-weight: 600;
+      font-size: 0.9rem;
+      color: var(--gold);
+    }
+
+    /* Testimonials */
+    .testimonial-slider {
+      display: flex;
+      gap: 30px;
+      overflow-x: auto;
+      padding: 20px 4px 40px;
+      scroll-snap-type: x mandatory;
+    }
+
+    .testimonial-card {
+      min-width: 300px;
+      background: #0e0e0e;
+      border-radius: 28px;
+      padding: 28px;
+      border-left: 5px solid var(--gold);
+      scroll-snap-align: start;
+    }
+
+    .stars {
+      color: var(--gold);
+      margin-bottom: 16px;
+    }
+
+    .review-text {
+      font-style: italic;
+      margin-bottom: 20px;
+      line-height: 1.4;
+    }
+
+    /* Opening & map & contact */
+    .info-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 40px;
+      justify-content: space-between;
+    }
+    .info-card {
+      flex: 1;
+      background: #0c0c0c;
+      padding: 28px;
+      border-radius: 28px;
+      border: 1px solid #222;
+    }
+    .hours-list {
+      list-style: none;
+      margin-top: 16px;
+    }
+    .hours-list li {
+      display: flex;
+      justify-content: space-between;
+      padding: 10px 0;
+      border-bottom: 1px solid #2a2a2a;
+    }
+
+    #map {
+      height: 260px;
+      border-radius: 20px;
+      margin-top: 10px;
+      z-index: 0;
+    }
+
+    /* WhatsApp fixed button */
+    .whatsapp-float {
+      position: fixed;
+      bottom: 30px;
+      right: 30px;
+      background: #25D366;
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 32px;
+      color: white;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+      transition: 0.2s;
+      z-index: 99;
+    }
+    .whatsapp-float:hover {
+      transform: scale(1.08);
+      background: #20b359;
+    }
+
+    /* social icons */
+    .social-icons {
+      display: flex;
+      gap: 28px;
+      margin: 24px 0;
+    }
+    .social-icons a {
+      color: white;
+      font-size: 1.8rem;
+      transition: 0.2s;
+    }
+    .social-icons a:hover {
+      color: var(--gold);
+      transform: translateY(-3px);
+    }
+
+    footer {
+      background: #020202;
+      padding: 48px 0 32px;
+      border-top: 1px solid #222;
+    }
+    .footer-grid {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      gap: 30px;
+    }
+    .footer-col p {
+      margin: 10px 0;
+      opacity: 0.8;
+    }
+    .copyright {
+      text-align: center;
+      margin-top: 48px;
+      padding-top: 24px;
+      border-top: 1px solid #1f1f1f;
+      font-size: 0.85rem;
+    }
+
+    @media (max-width: 850px) {
+      .nav-links {
+        display: none;
+        width: 100%;
+        flex-direction: column;
+        text-align: center;
+        padding: 20px 0;
+      }
+      .nav-links.active {
+        display: flex;
+      }
+      .mobile-menu-btn {
+        display: block;
+      }
+      .hero-content h1 {
+        font-size: 2.2rem;
+      }
+      .section-title {
+        font-size: 1.9rem;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<nav>
+  <div class="container nav-wrapper">
+    <div class="logo">
+      <i class="fas fa-cut"></i>
+      <span>JUNCTION BARBER</span>
+    </div>
+    <div class="mobile-menu-btn" id="menuToggle">
+      <i class="fas fa-bars"></i>
+    </div>
+    <ul class="nav-links" id="navLinks">
+      <li><a href="#home">Home</a></li>
+      <li><a href="#hair-styles">Hair Styles</a></li>
+      <li><a href="#pricing">Pricing</a></li>
+      <li><a href="#gallery">Gallery</a></li>
+      <li><a href="#about">About</a></li>
+      <li><a href="#contact">Contact</a></li>
+    </ul>
+  </div>
+</nav>
+
+<main>
+  <!-- Hero Section -->
+  <section id="home" class="hero">
+    <div class="container hero-content">
+      <h1>Sharp Cuts. Clean Style.<br><span>Confidence Starts Here.</span></h1>
+      <p>Premium grooming | Urban energy | Precision craftsmanship</p>
+      <button class="btn-gold" id="onlineBookingBtn">✂️ Book Your Spot</button>
+    </div>
+  </section>
+
+  <!-- Haircut Styles + Pricing combined (cards with images & desc) -->
+  <section id="hair-styles" style="padding-bottom: 20px;">
+    <div class="container">
+      <div class="section-title">Signature Cuts & Charges</div>
+      <div class="cards-grid" id="pricingGrid"></div>
+    </div>
+  </section>
+
+  <!-- Gallery: before & after -->
+  <section id="gallery">
+    <div class="container">
+      <div class="section-title">Before & After Gallery</div>
+      <div class="gallery-grid" id="galleryGrid"></div>
+    </div>
+  </section>
+
+  <!-- Testimonials -->
+  <section id="about">
+    <div class="container">
+      <div class="section-title">What Our Clients Say</div>
+      <div class="testimonial-slider" id="testimonials"></div>
+      <div class="social-icons" style="justify-content: center; margin-top: 2rem;">
+        <a href="#"><i class="fab fa-instagram"></i></a>
+        <a href="#"><i class="fab fa-facebook-f"></i></a>
+        <a href="#"><i class="fab fa-twitter"></i></a>
+        <a href="#"><i class="fab fa-tiktok"></i></a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Opening Hours + Location + Contact (Google Maps placeholder) -->
+  <section id="contact">
+    <div class="container">
+      <div class="section-title">Visit Us</div>
+      <div class="info-grid">
+        <div class="info-card">
+          <h3><i class="fas fa-clock" style="color: var(--gold);"></i> Opening Hours</h3>
+          <ul class="hours-list">
+            <li><span>Monday - Friday</span> <span>9:00 AM – 8:00 PM</span></li>
+            <li><span>Saturday</span> <span>10:00 AM – 7:00 PM</span></li>
+            <li><span>Sunday</span> <span>11:00 AM – 5:00 PM</span></li>
+          </ul>
+        </div>
+        <div class="info-card">
+          <h3><i class="fas fa-map-marker-alt" style="color: var(--gold);"></i> Location</h3>
+          <p>Junction Mall, 2nd Floor, Nairobi, Kenya</p>
+          <div id="map" style="height: 180px; margin-top: 15px;"></div>
+          <small style="opacity:0.7;">📍 Junction Mall, Ngong Road</small>
+        </div>
+        <div class="info-card">
+          <h3><i class="fas fa-phone-alt" style="color: var(--gold);"></i> Contact Direct</h3>
+          <p><i class="fas fa-phone"></i> +254 700 123 456</p>
+          <p><i class="fas fa-envelope"></i> cuts@junctionbarber.com</p>
+          <button class="btn-outline" id="contactWhatsappBtn" style="margin-top: 16px;"><i class="fab fa-whatsapp"></i> Chat on WhatsApp</button>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-col">
+        <h3 style="color: var(--gold);">Junction Barber</h3>
+        <p>Sharp cuts, premium atmosphere.</p>
+        <p><i class="fas fa-phone-alt"></i> +254 700 123 456</p>
+        <p><i class="fas fa-envelope"></i> cuts@junctionbarber.com</p>
+        <p><i class="fas fa-location-dot"></i> Junction Mall, Nairobi</p>
+      </div>
+      <div class="footer-col">
+        <h4>Quick links</h4>
+        <p><a href="#hair-styles" style="color: white; text-decoration: none;">Hair Styles</a></p>
+        <p><a href="#gallery" style="color: white; text-decoration: none;">Gallery</a></p>
+        <p><a href="#contact" style="color: white; text-decoration: none;">Booking</a></p>
+      </div>
+      <div class="footer-col">
+        <h4>Follow us</h4>
+        <div class="social-icons" style="margin: 10px 0 0 0; gap: 18px;">
+          <a href="#"><i class="fab fa-instagram"></i></a>
+          <a href="#"><i class="fab fa-facebook"></i></a>
+          <a href="#"><i class="fab fa-whatsapp"></i></a>
+        </div>
+      </div>
+    </div>
+    <div class="copyright">
+      © 2026 Junction Barber. All Rights Reserved.
+    </div>
+  </div>
+</footer>
+
+<!-- WhatsApp fixed button -->
+<a href="https://wa.me/254700123456?text=Hello%20Junction%20Barber%2C%20I'd%20like%20to%20book%20an%20appointment!" class="whatsapp-float" target="_blank">
+  <i class="fab fa-whatsapp"></i>
+</a>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+  // Data for haircut styles & charges
+  const haircutData = [
+    { name: "Fade Cut", price: "KSh 300", desc: "Classic clean fade, tailored finish.", img: "https://images.pexels.com/photos/247917/pexels-photo-247917.jpeg?auto=compress&cs=tinysrgb&w=400" },
+    { name: "Low Fade", price: "KSh 350", desc: "Subtle low fade for modern edge.", img: "https://images.pexels.com/photos/3998406/pexels-photo-3998406.jpeg?auto=compress&cs=tinysrgb&w=400" },
+    { name: "High Fade", price: "KSh 400", desc: "Bold high fade, sharp and stylish.", img: "https://images.pexels.com/photos/2661891/pexels-photo-2661891.jpeg?auto=compress&cs=tinysrgb&w=400" },
+    { name: "Buzz Cut", price: "KSh 250", desc: "Quick, even, and low maintenance.", img: "https://images.pexels.com/photos/2647350/pexels-photo-2647350.jpeg?auto=compress&cs=tinysrgb&w=400" },
+    { name: "Dreadlocks Styling", price: "KSh 800", desc: "Retwist & professional styling.", img: "https://images.pexels.com/photos/2589653/pexels-photo-2589653.jpeg?auto=compress&cs=tinysrgb&w=400" },
+    { name: "Hair Dye & Design", price: "KSh 1,200", desc: "Creative colors and custom patterns.", img: "https://images.pexels.com/photos/3997389/pexels-photo-3997389.jpeg?auto=compress&cs=tinysrgb&w=400" },
+    { name: "Kids Haircut", price: "KSh 200", desc: "Gentle cut for young gents.", img: "https://images.pexels.com/photos/3345236/pexels-photo-3345236.jpeg?auto=compress&cs=tinysrgb&w=400" },
+    { name: "Beard Shaping", price: "KSh 150", desc: "Precision shaping and hot towel.", img: "https://images.pexels.com/photos/3998409/pexels-photo-3998409.jpeg?auto=compress&cs=tinysrgb&w=400" },
+    { name: "Classic Afro Trim", price: "KSh 300", desc: "Shape & volume for natural afro.", img: "https://images.pexels.com/photos/2633883/pexels-photo-2633883.jpeg?auto=compress&cs=tinysrgb&w=400" },
+    { name: "VIP Grooming Package", price: "KSh 1,500", desc: "Full haircut + beard + facial.", img: "https://images.pexels.com/photos/3184388/pexels-photo-3184388.jpeg?auto=compress&cs=tinysrgb&w=400" }
+  ];
+
+  // Before/After images (stylish realistic stock images)
+  const beforeAfter = [
+    { before: "https://images.pexels.com/photos/3184386/pexels-photo-3184386.jpeg?auto=compress&cs=tinysrgb&w=400", after: "https://images.pexels.com/photos/3184390/pexels-photo-3184390.jpeg?auto=compress&cs=tinysrgb&w=400", label: "Classic Fade Transformation" },
+    { before: "https://images.pexels.com/photos/247917/pexels-photo-247917.jpeg?auto=compress&cs=tinysrgb&w=400", after: "https://images.pexels.com/photos/3998406/pexels-photo-3998406.jpeg?auto=compress&cs=tinysrgb&w=400", label: "Low Fade Upgrade" },
+    { before: "https://images.pexels.com/photos/2647350/pexels-photo-2647350.jpeg?auto=compress&cs=tinysrgb&w=400", after: "https://images.pexels.com/photos/2661891/pexels-photo-2661891.jpeg?auto=compress&cs=tinysrgb&w=400", label: "Buzz Cut to High Fade" }
+  ];
+
+  // Testimonials
+  const testimonialsData = [
+    { name: "Ethan M.", stars: 5, text: "Best fade in town! The atmosphere is premium and the barbers are super skilled. Highly recommend Junction Barber." },
+    { name: "Daniel K.", stars: 5, text: "Got the VIP Grooming Package. Worth every shilling. Clean lines and excellent service!" },
+    { name: "Brian O.", stars: 4, text: "Beard shaping was on point. They listen to what you want. Definitely coming back." },
+    { name: "James N.", stars: 5, text: "Modern, urban, and super friendly. My new regular spot." }
+  ];
+
+  function renderPricing() {
+    const grid = document.getElementById('pricingGrid');
+    if(!grid) return;
+    grid.innerHTML = haircutData.map(item => `
+      <div class="price-card">
+        <div class="card-img" style="background-image: url('${item.img}');"></div>
+        <div class="card-content">
+          <div class="card-title"><span>${item.name}</span> <span class="price">${item.price}</span></div>
+          <div class="desc">${item.desc}</div>
+        </div>
+      </div>
+    `).join('');
+  }
+
+  function renderGallery() {
+    const galleryDiv = document.getElementById('galleryGrid');
+    if(!galleryDiv) return;
+    galleryDiv.innerHTML = beforeAfter.map(item => `
+      <div class="ba-item">
+        <div style="display: flex; height: 220px;">
+          <img src="${item.before}" alt="before" style="width:50%; object-fit:cover;">
+          <img src="${item.after}" alt="after" style="width:50%; object-fit:cover;">
+        </div>
+        <div class="ba-label"><span>✂️ BEFORE</span><span>AFTER ✨</span></div>
+        <div style="padding: 12px 16px; background: #0c0c0c; text-align:center; font-weight:500;">${item.label}</div>
+      </div>
+    `).join('');
+  }
+
+  function renderTestimonials() {
+    const cont = document.getElementById('testimonials');
+    if(!cont) return;
+    cont.innerHTML = testimonialsData.map(t => `
+      <div class="testimonial-card">
+        <div class="stars">${'★'.repeat(t.stars)}${'☆'.repeat(5-t.stars)}</div>
+        <div class="review-text">“${t.text}”</div>
+        <div style="font-weight:700;">— ${t.name}</div>
+      </div>
+    `).join('');
+  }
+
+  // Google maps placeholder with leaflet (Nairobi Junction Mall)
+  function initMap() {
+    const mapElement = document.getElementById('map');
+    if(mapElement && typeof L !== 'undefined') {
+      // Coordinates for Junction Mall, Nairobi
+      const coords = [-1.302, 36.764];
+      const map = L.map('map').setView(coords, 15);
+      L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OSM</a> contributors'
+      }).addTo(map);
+      L.marker(coords).addTo(map).bindPopup('📍 Junction Barber, 2nd Floor Junction Mall').openPopup();
+    } else if(mapElement) {
+      mapElement.innerHTML = '<div style="background:#222; padding:20px; text-align:center; border-radius:20px;">📍 Junction Mall, Nairobi — Google Maps placeholder active</div>';
+    }
+  }
+
+  //
